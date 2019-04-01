@@ -143,3 +143,9 @@ syscall(void)
     curproc->tf->eax = -1;
   }
 }
+
+int
+sys_getprocs(void)
+{
+  return getprocs();
+}
