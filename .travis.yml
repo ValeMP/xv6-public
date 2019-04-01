@@ -1,14 +1,14 @@
+language: c
+script: make && make fs.img
 deploy:
   provider: releases
   api_key:
     secure: ci3Pait66Bp7NnVf2LKb1GJAACR5G0tG8Sq0wKmGsnxnWT+kpgg/SuNifv5iUBrX4glgOzsC8N/KlEvv+8LaFr+TEx/d71KDNh0KdlN3QKJgJsp/5uZN1MlQ69yV8kU4Na9IGJP78dHA8887c0561bKqNxUG0nPwB+/fHlNEiWw6TAkcw4NUrv+Xz9rPHMcGAHUJI2hd4430YlR5JFqUz7FrkO5v+kPsrHc2DmSj2DE4PEOmyNgw0kdUuCsvq4d4z0UsEzyO4u8DkcatM3az+EDXaxwivKIcy5um/ggVQWztlFsDNW78v5uAtKfQ/Qzapg2ospQjPq54XOkuKs2AORRECYOgUs9lR6u/t14K7Jd+yJfADZpoawC0z2CQP9nwpSBHE2FuFHJVOQg6RaGRPJYDtEEVJsva9XKaGo4LxuTeYtwVTV9ZELLVxCbypVg+S9kDrzRa1/bQ2Fuh4bUgyamVRI+EBPMLD6e+FO4HGTvllOGnMmfqhKMe9qYMQUAjWLI0pRE3f7ewiuRloGhLgygi9bAIJr92gtrva9UO/MWLUvnZ8c47JNf9TEdTvmcqnkuX7WPShGbFLpq/aVxBnbBYV9XkjqA6OhpHAFcSsWdr3DqwMzUw1zK869IUD83jycHrUeuffyfL+4+V5Dqhufd9L/IVdeHYllh0mmZWDZA=
   file: 
-	- fs.img
-	- xv6.img
+  - fs.img
+  - xv6.img
   skip_cleanup:true
   on:
     repo: ValeMP/xv6-public
     branch: project_1
   tags: true
-language: c
-script: make && make fs.img
