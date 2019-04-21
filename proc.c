@@ -319,6 +319,17 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+//nuevo
+//funcion usada para generar un num aleatorio
+static
+unsigned long
+lcg_rand(unsigned long a)
+{
+  unsigned long b=279470273, c=101;
+  return (a*b)%c
+}
+//nuevo
 void
 scheduler(void)
 {
@@ -326,15 +337,33 @@ scheduler(void)
   struct cpu *c = mycpu();
   c->proc = 0;
   
+  //nuevo
+  int number_tickets=100; 
+  int runval=0;
+  int ticketGanador;
+  //nuevo
+  
   for(;;){
+    //nuevo
+    runval++;
+    //nuevo
+    
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    
+    ticketGanador=lcg_rand(runval);
+    
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
+        ticketGanador-=p->tickets;
+      
+      if(p->state !=RUNNABLE || ticketGanador>=0)
         continue;
+      
+      cprintf("Proceso Ganador: #%s \n", p->name);
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
