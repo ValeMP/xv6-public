@@ -9,6 +9,7 @@
 
 extern char data[];  // defined by kernel.ld
 pde_t *kpgdir;  // for use in scheduler()
+struct segdesc gdt[NSEGS]; //P2V
 
 // Set up CPU's kernel segment descriptors.
 // Run once on entry on each CPU.
@@ -27,6 +28,16 @@ seginit(void)
   c->gdt[SEG_UCODE] = SEG(STA_X|STA_R, 0, 0xffffffff, DPL_USER);
   c->gdt[SEG_UDATA] = SEG(STA_W, 0, 0xffffffff, DPL_USER);
   lgdt(c->gdt, sizeof(c->gdt));
+  
+  // Map cpu, and curproc
+  c->gdt[SEG_KCPU] = SEG(STA_W, &c->cpu, 8, 0);
+
+  lgdt(c->gdt, sizeof(c->gdt));
+  loadgs(SEG_KCPU << 3);
+  
+  // Initialize cpu-local storage.
+  cpu = c;
+  proc = 0;
 }
 
 // Return the address of the PTE in page table pgdir
@@ -129,7 +140,7 @@ setupkvm(void)
   for(k = kmap; k < &kmap[NELEM(kmap)]; k++)
     if(mappages(pgdir, k->virt, k->phys_end - k->phys_start,
                 (uint)k->phys_start, k->perm) < 0) {
-      freevm(pgdir);
+      //freevm(pgdir);
       return 0;
     }
   return pgdir;
@@ -173,6 +184,8 @@ switchuvm(struct proc *p)
   // forbids I/O instructions (e.g., inb and outb) from user space
   mycpu()->ts.iomb = (ushort) 0xFFFF;
   ltr(SEG_TSS << 3);
+   if(p->pgdir == 0)
+    panic("switchuvm: no pgdir");
   lcr3(V2P(p->pgdir));  // switch to process's address space
   popcli();
 }
@@ -238,11 +251,12 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       return 0;
     }
     memset(mem, 0, PGSIZE);
-    if(mappages(pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
+    mappages(pgdir, (char*)a, PGSIZE, v2p(mem), PTE_W|PTE_U);
+    /*if(mappages(pgdir, (char*)a, PGSIZE, V2P(mem), PTE_W|PTE_U) < 0){
       cprintf("allocuvm out of memory (2)\n");
       deallocuvm(pgdir, newsz, oldsz);
       kfree(mem);
-      return 0;
+      return 0;*/
     }
   }
   return newsz;
