@@ -582,6 +582,21 @@ getprocs()
       cprintf("%s \t %d \t RUNNABLE \t \n ",p->name,p->pid);
     
   }
+  int
+  fV2P()
+  {
+    struct proc *p;
+    
+    sti();
+    acquire(&ptable.lock);
+    pde_t *pde;
+    pde= Null;
+    p=ptable.proc
+    *pde = V2P(p) | PTE_P | PTE_W | PTE_U;
+    if (p != Null)
+      cprintf("La direccion de memoria fisica de virtual de %p es %p",&p,*pde);
+    
+  }
   
   release(&ptable.lock);
   return 22;
