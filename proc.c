@@ -585,16 +585,15 @@ getprocs()
   int
   fV2P()
   {
-    struct proc *p;
     
-    sti();
-    acquire(&ptable.lock);
+    struct proc *p;
+    p=myproc();
+    
     pde_t *pde;
-    pde= Null;
-    p=ptable.proc
-    *pde = V2P(p) | PTE_P | PTE_W | PTE_U;
-    if (p != Null)
-      cprintf("La direccion de memoria fisica de virtual de %p es %p",&p,*pde);
+    if(PTE_P){
+      *pde = V2P(PTE_ADDR(p->pgdir)) | PTE_P | PTE_W | PTE_U;
+      cprintf("La direccion de memoria fisica de virtual de %p es %p",p->pgdir,*pde);
+    }
     
   }
   
